@@ -2,8 +2,15 @@ let socket: WebSocket;
 let messageCallback: (msg: any) => void = () => {};
 
 export function connect() { 
-  const serverUrl = 'ws://localhost:3000'; 
-  console.log(`[Socket] Attempting to connect to ${serverUrl}...`);
+  const isProduction = window.location.hostname.includes('onrender.com');
+
+  const productionUrl = 'wss://snakes1v1.onrender.com'; 
+  const localUrl = 'ws://localhost:3000'; 
+
+  // 2. Flip the logic: If it's production, use production. Otherwise, local.
+  const serverUrl = isProduction ? productionUrl : localUrl;
+  
+  console.log(`[Socket] Target: ${serverUrl} (Host: ${window.location.hostname})`);
   
   socket = new WebSocket(serverUrl);
 

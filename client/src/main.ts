@@ -71,6 +71,12 @@ onMessage((msg) => {
       console.log("Game is starting! Initialize canvas here.");
       break;
 
+    case 'opponent-disconnected':
+      alert("Your opponent has disconnected!");
+      // Send them back to the main menu
+      showScreen('home'); 
+      break;
+
     case 'error':
       alert(`Error: ${msg.message}`);
       break;
