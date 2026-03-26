@@ -10,11 +10,11 @@ server.on('connection', (socket) => {
         const msg = JSON.parse(raw)
 
         if (msg.type === 'create-lobby') {
-            const code = Math.random().toString(36).slice(2, 7).toUpperCase()
-            lobbies[code] = { host: socket, guest: null }
-            socket.lobbyCode = code
+            const roomCode = Math.random().toString(36).slice(2, 7).toUpperCase()
+            lobbies[roomCode] = { host: socket, guest: null }
+            socket.lobbyCode = roomCode
             socket.role = 'host'
-            socket.send(JSON.stringify({ type: 'lobby-created', code }))
+            socket.send(JSON.stringify({ type: 'lobby-created', roomCode }))
         }
 
         if (msg.type === 'join-lobby') {

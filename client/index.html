@@ -1,13 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>snakes1v1</title>
+    <title>Snake 1v1</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="home-screen" class="screen">
+        <h1>Snake 1v1</h1>
+        <button id="btn-create">Create Game</button>
+        <button id="btn-show-join">Join Game</button>
+      </div>
+
+      <div id="waiting-screen" class="screen hidden">
+        <h2>Waiting for opponent...</h2>
+        <p>Share this code with your friend:</p>
+        <h1 id="room-code-display">-----</h1>
+      </div>
+
+      <div id="join-screen" class="screen hidden">
+        <h2>Join Game</h2>
+        <input type="text" id="room-code-input" placeholder="CODE" maxlength="5" autocomplete="off">
+        <button id="btn-submit-join">Join</button>
+        <button id="btn-back">Back</button>
+      </div>
+
+      <div id="game-screen" class="screen hidden">
+        <h2>Game Started!</h2>
+        <canvas id="game-canvas"></canvas>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,60 +1,81 @@
-import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
+import './style.css'; // Adjust the path if your css file is somewhere else
+import { connect, sendMessage, onMessage } from './net/socket';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src=${viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+// ... rest of your code ...
 
-<div class="ticks"></div>
+// --- DOM Elements ---
+const screens = {
+  home: document.getElementById('home-screen') as HTMLDivElement,
+  waiting: document.getElementById('waiting-screen') as HTMLDivElement,
+  join: document.getElementById('join-screen') as HTMLDivElement,
+  game: document.getElementById('game-screen') as HTMLDivElement,
+};
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src=${viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+const btns = {
+  create: document.getElementById('btn-create') as HTMLButtonElement,
+  showJoin: document.getElementById('btn-show-join') as HTMLButtonElement,
+  submitJoin: document.getElementById('btn-submit-join') as HTMLButtonElement,
+  back: document.getElementById('btn-back') as HTMLButtonElement,
+};
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+const inputs = {
+  code: document.getElementById('room-code-input') as HTMLInputElement,
+};
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+const displays = {
+  code: document.getElementById('room-code-display') as HTMLHeadingElement,
+};
+
+// --- Screen Management ---
+function showScreen(screenKey: keyof typeof screens) {
+  Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+  screens[screenKey].classList.remove('hidden');
+}
+
+// --- Event Listeners ---
+btns.create.addEventListener('click', () => {
+  console.log('[UI] Create Game button clicked!');
+  sendMessage({ type: 'create-lobby' });
+});
+
+btns.showJoin.addEventListener('click', () => {
+  showScreen('join');
+});
+
+btns.back.addEventListener('click', () => {
+  showScreen('home');
+});
+
+btns.submitJoin.addEventListener('click', () => {
+  const code = inputs.code.value.trim().toUpperCase();
+  if (code.length === 5) {
+    sendMessage({ type: 'join-lobby', code: code });
+  } else {
+    alert("Please enter a valid 5-character code.");
+  }
+});
+
+// --- Network Message Handling ---
+onMessage((msg) => {
+  switch (msg.type) {
+    case 'lobby-created':
+      // Server responds to Host with the new code
+      displays.code.innerText = msg.code;
+      showScreen('waiting');
+      break;
+      
+    case 'guest-joined': // <--- Handled by the HOST
+    case 'joined-lobby': // <--- Handled by the GUEST
+      // Both cases will trigger the code below!
+      showScreen('game');
+      console.log("Game is starting! Initialize canvas here.");
+      break;
+
+    case 'error':
+      alert(`Error: ${msg.message}`);
+      break;
+  }
+});
+
+// Initialize connection on load
+connect();
