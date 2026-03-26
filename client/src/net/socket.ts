@@ -4,7 +4,7 @@ let messageCallback: (msg: any) => void = () => {};
 export function connect() { 
   const isProduction = window.location.hostname.includes('onrender.com');
 
-  const productionUrl = 'wss://snakes1v1.onrender.com'; 
+  const productionUrl = 'wss://snakes1v1-server-eu.onrender.com'; 
   const localUrl = 'ws://localhost:3000'; 
 
   // 2. Flip the logic: If it's production, use production. Otherwise, local.
