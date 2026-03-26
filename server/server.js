@@ -1,12 +1,13 @@
-const WebSocket = require('ws')
+const WebSocket = require('ws');
 
-const server = new WebSocket.Server({ port: 3000 })
-
+// 1. Get the port from Render or fallback to 3000
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// 2. Create the server AND start it in one go
+const server = new WebSocket.Server({ port: PORT });
+
+// 3. Log that it's working
+console.log(`Signaling server running on port ${PORT}`);
 
 const lobbies = {}
 
